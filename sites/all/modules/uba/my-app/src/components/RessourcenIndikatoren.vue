@@ -4,7 +4,7 @@
             return {
                 filter: {
                     source: [],
-                    reference: [],
+                    spacial_reference: [],
                 },
                 xhr: {
                     data: [],

@@ -15,8 +15,8 @@
 						</div>
 						<hr class="border-grey border-b border-t-0 border-l-0 border-r-0">
 						<div class="mb-2">Territorialbezug:</div>
-						<div v-for="(item, index) in getUniqueList('reference',this.xhr.data)">
-							<input type="checkbox" :id="'references-'+index" :value="item" v-model="filter.reference">
+						<div v-for="(item, index) in getUniqueList('spacial_reference',this.xhr.data)">
+							<input type="checkbox" :id="'references-'+index" :value="item" v-model="filter.spacial_reference">
 							<label class="inline-block" :for="'references-'+index">{{item}}</label>
 						</div>
 					</div>
