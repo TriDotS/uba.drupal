@@ -24566,20 +24566,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var i = 0;
 
             var categories = this.xhr.data.categories;
-            console.log(categories);
-            console.log(categories.length);
-            console.log(this.filter.years);
-            console.log("Begin For Loop");
             for (i = 0; i < this.filter.years.length; i++) {
                 this.filter.years[i] = JSON.parse(JSON.stringify($.trim(this.filter.years[i])));
             }
             for (i = 0; i < categories.length; i++) {
-                console.log(categories[i]);
-                console.log(this.filter.years.indexOf(categories[i]));
                 boolYearArray.push(this.filter.years.indexOf(categories[i]) >= 0 ? true : false);
-                console.log("----------------------------");
             }
-            console.log("End For Loop");
             var series = this.xhr.data.series;
 
             for (i = 0; i < series.length; i++) {
