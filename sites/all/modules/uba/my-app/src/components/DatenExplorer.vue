@@ -81,11 +81,10 @@
 
                 let categories = this.xhr.data.categories;
                 for(i = 0; i < categories.length; i++) {
+                    console.log(this.filter.years.indexOf(categories[i]));
                     boolYearArray.push(this.filter.years.indexOf(categories[i]) >= 0 ? true:false);
                 }
                 let series = this.xhr.data.series;
-                
-                console.log(categories);
                 
                 for(i = 0; i < series.length; i++)
                 {

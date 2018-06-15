@@ -24567,11 +24567,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
             var categories = this.xhr.data.categories;
             for (i = 0; i < categories.length; i++) {
+                console.log(this.filter.years.indexOf(categories[i]));
                 boolYearArray.push(this.filter.years.indexOf(categories[i]) >= 0 ? true : false);
             }
             var series = this.xhr.data.series;
-
-            console.log(categories);
 
             for (i = 0; i < series.length; i++) {
                 if (this.filter.name.indexOf(series[i].name) >= 0) {
