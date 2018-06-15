@@ -1,0 +1,20 @@
+<?php
+	
+	function uba_enable() {
+		$t = get_t();
+		if (module_exists('menu')) {
+			menu_save(array(
+				'menu_name' => 'ressourcendaten',
+				'title' => $t('Ressourcendaten'),
+				'description' => $t('Ressourcendaten Hauptmenu'),
+			));
+		}
+	}
+	
+	function uba_uninstall() {
+		if (module_exists('menu')) {
+			if ($my_menu = menu_load('ressourcendaten')) {
+				menu_delete($my_menu);
+			}
+		}
+	}

@@ -1,0 +1,9 @@
+; ------------------------------------------------------------------------------
+; Custom created module for [Ressourcendaten.de] Umweltbundesamt
+; ------------------------------------------------------------------------------
+name = Ressourcendaten
+description = Provide Datenexplorer and Datenpool
+package = Ressourcendaten
+core = 7.x
+version = 7.x-1.0
+project = Umweltbundesamt

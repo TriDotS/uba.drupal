@@ -1,0 +1,210 @@
+<?php
+	/**
+	 * Implements hook_menu()
+	 */
+	function uba_menu() {
+		$items['data'] = array(
+			'type' => MENU_NORMAL_ITEM,
+			'title' => 'Data',
+			'description' => 'Wichtige Ressourcen-Daten',
+			'page callback' => 'ressourcendaten_page_data',
+			'access arguments' => array('access content'),
+			'menu_name' => 'ressourcendaten',
+			'weight' => 2,
+		);
+			$items['data/datenexplorer'] = array(
+				'title' => 'Datenexplorer',
+				'description' => '',
+				'page callback' => 'ressourcendaten_page_data_datenexplorer',
+				'access arguments' => array('access content'),
+			);
+			$items['data/datenpool'] = array(
+				'title' => 'Datenpool',
+				'description' => '',
+				'page callback' => 'ressourcendaten_page_data_datenpool',
+				'access arguments' => array('access content'),
+			);
+		$items['indikatoren'] = array(
+			'type' => MENU_NORMAL_ITEM,
+			'title' => 'Indikatoren',
+			'description' => 'Wichtige Ressourcen-Indikatoren',
+			'page callback' => 'ressourcendaten_page_indikatoren',
+			'access arguments' => array('access content'),
+			'menu_name' => 'ressourcendaten',
+			'weight' => 3,
+		);
+		$items['indikator/%'] = array(
+			'title' => 'Datenpool',
+			'description' => '',
+			'page arguments' => array(1),
+			'page callback' => 'ressourcendaten_page_indikator',
+			'access arguments' => array('access content'),
+		);
+		return $items;
+	}
+	
+	/**
+	 * Page callback sets up and returns the content for the Page Name page
+	 */
+	function ressourcendaten_page_data() {
+		$module_path = drupal_get_path('module', 'uba');
+		$data = array( 'uba' => array( 'path' => $module_path,),);
+		return theme('ressourcendaten_page_data', array());
+	}
+	
+	function ressourcendaten_page_data_datenexplorer() {
+		$module_path = drupal_get_path('module', 'uba');
+		$data = array( 'uba' => array( 'path' => $module_path, ), );
+		drupal_add_js($module_path. '/my-app/dist/app.js');
+		$ajax = file_get_contents('http://uba.webshox.org/api/resources-explorer');
+		$variables['json'] = json_decode($ajax);
+		return theme('ressourcendaten_page_data_datenexplorer',$variables);
+	}
+	
+	function ressourcendaten_page_data_datenpool() {
+		$module_path = drupal_get_path('module', 'uba');
+		$data = array( 'uba' => array( 'path' => $module_path, ), );
+		drupal_add_js($module_path. '/my-app/dist/app.js');
+		return theme('ressourcendaten_page_data_datenpool');
+	}
+	
+	function ressourcendaten_page_indikatoren() {
+		$module_path = drupal_get_path('module', 'uba');
+		$data = array( 'uba' => array( 'path' => $module_path, ), );
+		drupal_add_js($module_path. '/my-app/dist/app.js');
+		return theme('ressourcendaten_page_indikatoren');
+	}
+	
+	function ressourcendaten_page_indikator($indicator_id) {
+		$module_path = drupal_get_path('module', 'uba');
+		$data = array( 'uba' => array( 'path' => $module_path, ), );
+		drupal_add_js($module_path. '/my-app/dist/app.js');
+		$variables['indicator_id'] = $indicator_id;
+		$indicator = file_get_contents('http://uba-ckan.ext.datengrab.cc/api/indicators/'.$variables['indicator_id']);
+		$variables['indicator'] = json_decode($indicator);
+		//dvm($variables);
+		return theme('ressourcendaten_page_indikator',$variables);
+	}
+	
+	/**
+	 * Implements hook_theme.
+	 */
+	function uba_theme() {
+		return array(
+			'ressourcendaten_page_data' => array(
+				'template' => 'ressourcendaten--page--data',
+				'path' => drupal_get_path('module', 'uba') . '/templates',
+			),
+			'ressourcendaten_page_data_datenexplorer' => array(
+				'template' => 'ressourcendaten--page--data-datenexplorer',
+				'path' => drupal_get_path('module', 'uba') . '/templates',
+			),
+			'ressourcendaten_page_data_datenpool' => array(
+				'template' => 'ressourcendaten--page--data-datenpool',
+				'path' => drupal_get_path('module', 'uba') . '/templates',
+			),
+			'ressourcendaten_page_indikatoren' => array(
+				'template' => 'ressourcendaten--page--indikatoren',
+				'path' => drupal_get_path('module', 'uba') . '/templates',
+			),
+			'ressourcendaten_page_indikator' => array(
+				'template' => 'ressourcendaten--page--indikator',
+				'path' => drupal_get_path('module', 'uba') . '/templates',
+			),
+		);
+	}
+	
+	/**
+	 * Implements hook_preprocess_THEME().
+	 *
+	 * This Example preprocesses some variables to pass to the theme function/file.
+	 * DELETE IF UNNECESSARY! You probably won't need it, but it is here as an example
+	 */
+	function uba_preprocess_ressourcendaten_page_indikator(&$variables) {
+		$series = $variables['indicator']->series;
+		
+		$variables['preprocessed_indicator']                        = new stdClass();
+		$variables['preprocessed_indicator']->title                 = new stdClass();
+		$variables['preprocessed_indicator']->title->name           = $variables['indicator']->title;
+		$variables['preprocessed_indicator']->categories            = $variables['indicator']->categories;
+		$variables['preprocessed_indicator']->yAxis                 = new stdClass();;
+		$variables['preprocessed_indicator']->yAxis->title          = new stdClass();;
+		$variables['preprocessed_indicator']->yAxis->title->text    = 'Export (Tonnen)';
+		$variables['preprocessed_indicator']->series                = modifySeries($variables['indicator']->series);
+	}
+	
+	function modifySeries($rows)
+	{
+		$result = array();
+		foreach ($rows as $row) {
+			//debug(json_encode($row));
+			$result_item            = new stdClass();
+			
+			$result_item->name      = rowNameWithPrefix($row);
+			$result_item->checked   = setChecked($row->code);
+			$result_item->isHidden  = setIsHidden($row->code);
+			$result_item->level     = $row->code;
+			$result_item->data      = getData($row->data,'goods_import');
+			
+			array_push($result,$result_item);
+			//debug(json_encode($row->data));
+		}
+		return $result;
+	}
+	
+	function setIsHidden($id, $visibleLevel = 1)
+	{
+		$level_arr  = explode('-', $id);
+		$level      = strlen( $level_arr[1] ) - 1;
+		return $level <= $visibleLevel ? false : true;
+	}
+	
+	function setChecked($id, $checkedLevel = 1)
+	{
+		$level_arr  = explode('-', $id);
+		$level      = strlen( $level_arr[1] ) - 1;
+		return $level <= $checkedLevel ? true : false;
+	}
+	
+	function getData($data,$key)
+	{
+		$result2 = [];
+		foreach ($data as $obj)
+		{
+			array_push($result2, $obj->$key);
+		}
+		return $result2;
+	}
+	
+	function rowNameWithPrefix($data,$prefix = '-')
+	{
+		$level_arr  = explode('-', $data->code);
+		$level      = strlen( $level_arr[1] ) - 2;
+		$result = '';
+		for ($i = 1; $i <= $level; $i++) {
+			$result .= $prefix;
+		}
+		return $result.$data->name;
+		
+	}
+	
+	function uba_theme_registry_alter(&$theme_registry) {
+		// tell the theme system to look in the "templates" subdirectory within our module directory
+		$theme_registry['page__data']['theme paths'] = array(0 => drupal_get_path('module', 'uba') . '/templates');
+		$theme_registry['page__data']['theme path'] = drupal_get_path('module', 'uba') . '/templates';
+		$theme_registry['page__data']['path'] = drupal_get_path('module', 'uba') . '/templates';
+		// tell the theme system to use 'search-results.tpl.php' as the template file. Note that you do not include 'tpl.php'
+		$theme_registry['page__data']['template'] = 'ressourcendaten--page';
+		
+		$theme_registry['page__indikatoren']['theme paths'] = array(0 => drupal_get_path('module', 'uba') . '/templates');
+		$theme_registry['page__indikatoren']['theme path'] = drupal_get_path('module', 'uba') . '/templates';
+		$theme_registry['page__indikatoren']['path'] = drupal_get_path('module', 'uba') . '/templates';
+		// tell the theme system to use 'search-results.tpl.php' as the template file. Note that you do not include 'tpl.php'
+		$theme_registry['page__indikatoren']['template'] = 'ressourcendaten--page';
+		
+		$theme_registry['page__indikator']['theme paths'] = array(0 => drupal_get_path('module', 'uba') . '/templates');
+		$theme_registry['page__indikator']['theme path'] = drupal_get_path('module', 'uba') . '/templates';
+		$theme_registry['page__indikator']['path'] = drupal_get_path('module', 'uba') . '/templates';
+		// tell the theme system to use 'search-results.tpl.php' as the template file. Note that you do not include 'tpl.php'
+		$theme_registry['page__indikator']['template'] = 'ressourcendaten--page';
+	}
