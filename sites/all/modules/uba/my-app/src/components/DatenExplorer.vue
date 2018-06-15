@@ -85,7 +85,7 @@
                 }
                 let series = this.xhr.data.series;
                 
-                console.log(boolYearArray);
+                console.log(categories);
                 
                 for(i = 0; i < series.length; i++)
                 {
