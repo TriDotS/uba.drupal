@@ -24532,6 +24532,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 xAxis: {
                     categories: []
                 },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
                 yAxis: {
                     title: {
                         text: null
