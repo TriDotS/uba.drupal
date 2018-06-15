@@ -84,14 +84,12 @@
                     boolYearArray.push(this.filter.years.indexOf(categories[i]) >= 0 ? true:false);
                 }
                 let series = this.xhr.data.series;
-
+                
+                console.log(boolYearArray);
+                
                 for(i = 0; i < series.length; i++)
                 {
-                    console.log(this.filter.name);
-                    console.log(series[i].name);
-                    console.log(this.filter.name.indexOf(series[i].name));
-                    
-                    if(this.filter.name.indexOf(series[i].name) >= 0) {
+	                if(this.filter.name.indexOf(series[i].name) >= 0) {
                         let oldData = JSON.parse(JSON.stringify(series[i]));
                         let newData = [];
 
