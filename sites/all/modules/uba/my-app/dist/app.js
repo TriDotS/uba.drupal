@@ -24566,10 +24566,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var i = 0;
 
             var categories = this.xhr.data.categories;
+            console.log(categories);
+            console.log(categories.length);
+            console.log("Begin For Loop");
             for (i = 0; i < categories.length; i++) {
+                console.log(categories[i]);
                 console.log(this.filter.years.indexOf(categories[i]));
                 boolYearArray.push(this.filter.years.indexOf(categories[i]) >= 0 ? true : false);
+                console.log("----------------------------");
             }
+            console.log("End For Loop");
             var series = this.xhr.data.series;
 
             for (i = 0; i < series.length; i++) {
