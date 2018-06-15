@@ -135,11 +135,13 @@
 					<div class="section">
 						<a id="main-content"></a>
 						<?php print render($title_prefix); ?>
-						<?php if ( $title ): ?>
-							<h1 class="title" id="page-title">
-								<?php print $title; ?>
-							</h1>
-						<?php endif; ?>
+						<?php if (!drupal_is_front_page()) { ?>
+							<?php if ( $title ): ?>
+								<h1 class="title" id="page-title">
+									<?php print $title; ?>
+								</h1>
+							<?php endif; ?>
+						<?php } ?>
 						<?php print render($title_suffix); ?>
 						<?php if ( $tabs ): ?>
 							<div class="tabs">
@@ -152,7 +154,9 @@
 								<?php print render($action_links); ?>
 							</ul>
 						<?php endif; ?>
-						<?php print render($page[ 'content' ]); ?>
+						<?php if (!drupal_is_front_page()) { ?>
+							<?php print render($page['content']); ?>
+						<?php } ?>
 						<?php print $feed_icons; ?>
 					
 					</div>
@@ -162,16 +166,6 @@
 		
 		<div id="footer-wrapper">
 			<div class="section">
-				
-				<?php if ( $page[ 'footer_firstcolumn' ] || $page[ 'footer_secondcolumn' ] || $page[ 'footer_thirdcolumn' ] || $page[ 'footer_fourthcolumn' ] ): ?>
-					<div id="footer-columns" class="clearfix">
-						<?php print render($page[ 'footer_firstcolumn' ]); ?>
-						<?php print render($page[ 'footer_secondcolumn' ]); ?>
-						<?php print render($page[ 'footer_thirdcolumn' ]); ?>
-						<?php print render($page[ 'footer_fourthcolumn' ]); ?>
-					</div> <!-- /#footer-columns -->
-				<?php endif; ?>
-				
 				<?php if ( $page[ 'footer' ] ): ?>
 					<div id="footer" class="clearfix">
 						<?php print render($page[ 'footer' ]); ?>
