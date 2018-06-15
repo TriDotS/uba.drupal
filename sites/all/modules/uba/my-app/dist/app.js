@@ -24561,9 +24561,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }, 'jsonp');
         },
         filteredItems: function filteredItems(data, filters) {
-            console.log(data);
-            console.log(filters);
-
             var boolYearArray = [];
             var result = [];
             var i = 0;
@@ -24575,6 +24572,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var series = this.xhr.data.series;
 
             for (i = 0; i < series.length; i++) {
+                console.log(this.filter.name);
+                console.log(series[i].name);
+                console.log(this.filter.name.indexOf(series[i].name));
+
                 if (this.filter.name.indexOf(series[i].name) >= 0) {
                     var oldData = JSON.parse(JSON.stringify(series[i]));
                     var newData = [];
