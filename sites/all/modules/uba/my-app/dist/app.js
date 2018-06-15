@@ -24568,6 +24568,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             var categories = this.xhr.data.categories;
             console.log(categories);
             console.log(categories.length);
+            console.log(this.filter.years);
             console.log("Begin For Loop");
             for (i = 0; i < categories.length; i++) {
                 console.log(categories[i]);
