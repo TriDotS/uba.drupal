@@ -24500,6 +24500,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         };
     },
     created: function created() {
+        console.log(this.json);
         this.xhr.data = this.json;
     },
 

@@ -20,6 +20,7 @@
             }
         },
         created() {
+            console.log(this.json);
             this.xhr.data = this.json;
         },
         computed: {
