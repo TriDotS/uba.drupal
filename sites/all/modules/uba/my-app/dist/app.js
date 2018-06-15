@@ -24500,7 +24500,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         };
     },
     created: function created() {
-        console.log(this.json);
         this.xhr.data = this.json;
     },
 
@@ -24549,7 +24548,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             result.title.text = 'Energieträger';
             result.xAxis.categories = this.filter.years;
             result.series = JSON.parse(JSON.stringify(items));
-            console.log(result.series);
             return result;
         }
     },
@@ -24587,6 +24585,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     result.push(oldData);
                 };
             };
+            console.log(result);
             return result;
         }
     }

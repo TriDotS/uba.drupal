@@ -20,7 +20,6 @@
             }
         },
         created() {
-            console.log(this.json);
             this.xhr.data = this.json;
         },
         computed: {
@@ -63,7 +62,6 @@
                 result.title.text = 'Energieträger';
                 result.xAxis.categories = this.filter.years;
                 result.series = JSON.parse(JSON.stringify(items));
-                console.log(result.series);
                 return result;
             },
         },
@@ -103,6 +101,7 @@
                         result.push(oldData);
                     };
                 };
+                console.log(result);
                 return result;
 
 
