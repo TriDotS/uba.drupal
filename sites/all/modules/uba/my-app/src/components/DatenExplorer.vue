@@ -75,6 +75,9 @@
                 }, 'jsonp');
             },
             filteredItems(data,filters) {
+                console.log(data);
+                console.log(filters);
+                
                 let boolYearArray = [];
                 let result = [];
                 let i = 0;
@@ -101,7 +104,6 @@
                         result.push(oldData);
                     };
                 };
-                console.log(result);
                 return result;
 
 

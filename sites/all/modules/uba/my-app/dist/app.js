@@ -24561,6 +24561,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }, 'jsonp');
         },
         filteredItems: function filteredItems(data, filters) {
+            console.log(data);
+            console.log(filters);
+
             var boolYearArray = [];
             var result = [];
             var i = 0;
@@ -24585,7 +24588,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                     result.push(oldData);
                 };
             };
-            console.log(result);
             return result;
         }
     }
