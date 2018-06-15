@@ -24547,7 +24547,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             };
             result.title.text = 'Energieträger';
             result.xAxis.categories = this.filter.years;
-            result.series = items;
+            result.series = JSON.parse(JSON.stringify(items));
             return result;
         }
     },

@@ -61,7 +61,7 @@
                 };
                 result.title.text = 'Energieträger';
                 result.xAxis.categories = this.filter.years;
-                result.series = items;
+                result.series = JSON.parse(JSON.stringify(items));
                 return result;
             },
         },
