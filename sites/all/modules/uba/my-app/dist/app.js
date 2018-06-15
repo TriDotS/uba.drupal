@@ -24570,6 +24570,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             console.log(categories.length);
             console.log(this.filter.years);
             console.log("Begin For Loop");
+            for (i = 0; i < this.filter.years; i++) {
+                console.log(this.filter.years[i]);
+            }
             for (i = 0; i < categories.length; i++) {
                 console.log(categories[i]);
                 console.log(this.filter.years.indexOf(categories[i]));
