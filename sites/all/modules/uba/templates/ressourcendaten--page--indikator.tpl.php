@@ -9,9 +9,16 @@
 		<div class="wrapper">
 			<div class="flex flex-no-wrap">
 				<div class="w-1/2 flex-none">
-					<div class="text-grey-darker text-center p-1">
+					<div class="text-grey-darker p-1">
 						<div class="p-2 bg-grey-lighter mb-4">
-							<h6 class="text-greydarkest text-sm mb-0">Indikator-Beschreibung (Metadaten)</h6>
+							<h6 class="block text-greydarkest text-sm mb-0 text-center">Indikator-Beschreibung (Metadaten)</h6>
+						</div>
+						<div class="text-normal text-left">
+							<?php if ( $variables['indicator'] ): ?>
+								<p><strong>ID:</strong> <?php print $variables['indicator']->id; ?></p>
+								<p><strong>Quelle:</strong> <?php print $variables['indicator']->source; ?></p>
+								<p><strong>Lizenz:</strong> <?php print $variables['indicator']->license; ?></p>
+							<?php endif; ?>
 						</div>
 					</div>
 				</div>
@@ -50,9 +57,9 @@
 						</tr>
 						</thead>
 						<tbody class="my-2 border-0">
-							<tr v-for="(item, index) in this.table.tbody" :class="{hidden: item.isHidden}">
+							<tr v-for="(item, index) in this.table.tbody" :class="{'hidden': item.isHidden, ['level-'+capitalize(item.level)]:item.level }" >
 								<td><input type="checkbox" :value="index" v-model="item.checked"></td>
-								<td @click="showChildren(item)">></td>
+								<td @click="showChildren(item)" :class="{'rot-90 pl-2': item.expanded}">></td>
 								<td>{{item.name}}</td>
 								<td v-for="value in item.data">{{value}}</td>
 							</tr>

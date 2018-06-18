@@ -100,6 +100,12 @@
             },
 	    },
 	    methods: {
+            capitalize(value) {
+                let curr_item_arr = value.split('-');
+                let curr_level = curr_item_arr[1].length - 1;
+                console.log(value);
+                return curr_level;
+            },
             updateTable() {
                 if(this.table.tbody === null) { this.table.tbody = JSON.parse(JSON.stringify(this.series)); }
                 
@@ -126,16 +132,36 @@
             },
 
             showChildren(item) {
+                if(item.expanded) {
+                    item.expanded = false;
+                } else {
+                    item.expanded = true;
+                }
+	            // split level to array "ABC-01234" => ['ABC','01234']
                 let curr_item_arr = item.level.split('-');
+                // level = stringleght - 1
 	            let curr_level = curr_item_arr[1].length - 1;
+	            // current category
 	            let curr_category = curr_item_arr[0];
+	            // loop through all rows
                 for(let i = 0; i < this.table.tbody.length; i++) {
+                    // split the current row level to array
                     let row_item_arr = this.table.tbody[i].level.split('-');
+                    // get the curretn row level
                     let row_level = row_item_arr[1].length - 1;
+                    //get the current row category
                     let row_category = row_item_arr[0];
-                    if( row_category === curr_category && row_level === curr_level + 1 && this.table.tbody[i].level.indexOf(item.level) === 0) {
-                        this.table.tbody[i].isHidden = !this.table.tbody[i].isHidden;
-                    }
+	                let isHidden = this.table.tbody[i].isHidden;
+	                if( isHidden ) {
+                        if( row_category === curr_category && row_level === curr_level + 1 && this.table.tbody[i].level.indexOf(item.level) === 0) {
+                            this.table.tbody[i].isHidden = !isHidden;
+                        }
+	                } else {
+                        if( row_category === curr_category && row_level >= curr_level + 1) {
+                            this.table.tbody[i].isHidden = !isHidden;
+                            this.table.tbody[i].expanded = false;
+                        }
+	                }
                 }
             },
 		    
@@ -164,3 +190,32 @@
      
     }
 </script>
+
+
+<style lang="scss" scoped>
+	
+	.level-1 {
+		background-color: darken(#fff,0%);
+	}
+	.level-2 {
+		background-color: darken(#fff,5%);
+	}
+	.level-3 {
+		background-color: darken(#fff,10%);
+	}
+	.level-4 {
+		background-color: darken(#fff,15%);
+	}
+	.level-5 {
+		background-color: darken(#fff,20%);
+	}
+	.level-6 {
+		background-color: darken(#fff,25%);
+	}
+	.level-7 {
+		background-color: darken(#fff,30%);
+	}
+	.rot-90 {
+		transform: rotate(90deg);
+	}
+</style>

@@ -25560,6 +25560,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(62)
+}
 var normalizeComponent = __webpack_require__(1)
 /* script */
 var __vue_script__ = __webpack_require__(53)
@@ -25568,9 +25572,9 @@ var __vue_template__ = null
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
-var __vue_styles__ = null
+var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = null
+var __vue_scopeId__ = "data-v-e602c73c"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
@@ -25718,6 +25722,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         }
     },
     methods: {
+        capitalize: function capitalize(value) {
+            var curr_item_arr = value.split('-');
+            var curr_level = curr_item_arr[1].length - 1;
+            console.log(value);
+            return curr_level;
+        },
         updateTable: function updateTable() {
             if (this.table.tbody === null) {
                 this.table.tbody = JSON.parse(JSON.stringify(this.series));
@@ -25748,15 +25758,35 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             this.table.tbody = tbody;
         },
         showChildren: function showChildren(item) {
+            if (item.expanded) {
+                item.expanded = false;
+            } else {
+                item.expanded = true;
+            }
+            // split level to array "ABC-01234" => ['ABC','01234']
             var curr_item_arr = item.level.split('-');
+            // level = stringleght - 1
             var curr_level = curr_item_arr[1].length - 1;
+            // current category
             var curr_category = curr_item_arr[0];
+            // loop through all rows
             for (var i = 0; i < this.table.tbody.length; i++) {
+                // split the current row level to array
                 var row_item_arr = this.table.tbody[i].level.split('-');
+                // get the curretn row level
                 var row_level = row_item_arr[1].length - 1;
+                //get the current row category
                 var row_category = row_item_arr[0];
-                if (row_category === curr_category && row_level === curr_level + 1 && this.table.tbody[i].level.indexOf(item.level) === 0) {
-                    this.table.tbody[i].isHidden = !this.table.tbody[i].isHidden;
+                var isHidden = this.table.tbody[i].isHidden;
+                if (isHidden) {
+                    if (row_category === curr_category && row_level === curr_level + 1 && this.table.tbody[i].level.indexOf(item.level) === 0) {
+                        this.table.tbody[i].isHidden = !isHidden;
+                    }
+                } else {
+                    if (row_category === curr_category && row_level >= curr_level + 1) {
+                        this.table.tbody[i].isHidden = !isHidden;
+                        this.table.tbody[i].expanded = false;
+                    }
                 }
             }
         },
@@ -26010,6 +26040,48 @@ function clone(obj) {
     return copy;
   }
 }
+
+
+/***/ }),
+/* 60 */,
+/* 61 */,
+/* 62 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(63);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(41)("4dcae3f5", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-e602c73c\",\"scoped\":true,\"hasInlineConfig\":true}!../../node_modules/sass-loader/lib/loader.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./RessourcenAuswertung.vue", function() {
+     var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-e602c73c\",\"scoped\":true,\"hasInlineConfig\":true}!../../node_modules/sass-loader/lib/loader.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./RessourcenAuswertung.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(40)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.level-1[data-v-e602c73c] {\n  background-color: white;\n}\n.level-2[data-v-e602c73c] {\n  background-color: #f2f2f2;\n}\n.level-3[data-v-e602c73c] {\n  background-color: #e6e6e6;\n}\n.level-4[data-v-e602c73c] {\n  background-color: #d9d9d9;\n}\n.level-5[data-v-e602c73c] {\n  background-color: #cccccc;\n}\n.level-6[data-v-e602c73c] {\n  background-color: #bfbfbf;\n}\n.level-7[data-v-e602c73c] {\n  background-color: #b3b3b3;\n}\n.rot-90[data-v-e602c73c] {\n  transform: rotate(90deg);\n}\n", ""]);
+
+// exports
 
 
 /***/ })
