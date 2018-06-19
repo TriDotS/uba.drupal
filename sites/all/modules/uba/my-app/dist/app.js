@@ -26223,8 +26223,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             }
         },
         onSubmit: function onSubmit() {
-            var _paq = _paq || [];
-            console.log(_paq);
+            var _paq = window._paq || [];
+            _paq.push(['trackEvent', 'Rohstoffproduktivität', 'Darstellung Einschränken', this.startYear + '-' + this.endYear, 1]);
             this.updateTable();
         },
         onReset: function onReset() {

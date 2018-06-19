@@ -262,8 +262,8 @@
             },
 		    
             onSubmit() {
-                let _paq = _paq || [];
-                console.log(_paq);
+                let _paq = window._paq || [];
+                _paq.push(['trackEvent', 'Rohstoffproduktivität', 'Darstellung Einschränken', this.startYear+'-'+this.endYear,1]);
                 this.updateTable();
             },
 
