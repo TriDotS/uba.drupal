@@ -131,6 +131,11 @@
 		$variables['preprocessed_indicator']->yAxis->title          = new stdClass();;
 		$variables['preprocessed_indicator']->yAxis->title->text    = 'Export (Tonnen)';
 		$variables['preprocessed_indicator']->series                = modifySeries($variables['indicator']->series);
+		$variables['preprocessed_indicator']->meta                  = new stdClass();
+		$variables['preprocessed_indicator']->meta->license         = $variables['indicator']->license;
+		$variables['preprocessed_indicator']->meta->source          = $variables['indicator']->source;
+		$variables['preprocessed_indicator']->description           = $variables['indicator']->description;
+		
 	}
 	
 	function modifySeries($rows)

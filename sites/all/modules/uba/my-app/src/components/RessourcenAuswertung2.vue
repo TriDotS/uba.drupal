@@ -7,9 +7,9 @@
 						<h6 class="block text-greydarkest text-sm mb-0 text-center">Indikator-Beschreibung (Metadaten)</h6>
 					</div>
 					<div class="text-normal text-left">
-						<p><strong>ID:</strong> asdasd</p>
-						<p><strong>Quelle:</strong> test</p>
-						<p><strong>Lizenz:</strong> test</p>
+						<p><strong>ID:</strong> {{this.id}}</p>
+						<p><strong>Quelle:</strong> {{this.indicator.meta.source}}</p>
+						<p><strong>Lizenz:</strong> {{this.indicator.meta.license}}</p>
 					</div>
 				</div>
 			</div>
@@ -19,7 +19,7 @@
 						<h6 class="text-greydarkest text-sm mb-0">Indikator-Erläuterung</h6>
 					</div>
 					<div class="text-normal text-left">
-						DESC
+						{{this.indicator.description}}
 					</div>
 				</div>
 			</div>
@@ -103,7 +103,7 @@
 </template>
 <script>
     export default {
-        props: ['id', 'url', 'categories', 'series','name'],
+        props: ['id', 'url', 'categories', 'series','name','indicator'],
         data() {
             return {
                 isVisibleDiagram: false,
@@ -124,6 +124,7 @@
         },
         mounted() {
             this.updateTable();
+            console.log(this.indicator);
         },
 	    computed: {
             startYearPlaceholder() {

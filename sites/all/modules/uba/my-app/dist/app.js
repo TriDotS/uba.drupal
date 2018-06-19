@@ -26053,7 +26053,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    props: ['id', 'url', 'categories', 'series', 'name'],
+    props: ['id', 'url', 'categories', 'series', 'name', 'indicator'],
     data: function data() {
         return {
             isVisibleDiagram: false,
@@ -26074,6 +26074,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     mounted: function mounted() {
         this.updateTable();
+        console.log(this.indicator);
     },
 
     computed: {
@@ -26258,7 +26259,42 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "wrapper" }, [
-    _vm._m(0),
+    _c("div", { staticClass: "flex flex-no-wrap" }, [
+      _c("div", { staticClass: "w-1/2 flex-none" }, [
+        _c("div", { staticClass: "text-grey-darker p-1" }, [
+          _vm._m(0),
+          _vm._v(" "),
+          _c("div", { staticClass: "text-normal text-left" }, [
+            _c("p", [
+              _c("strong", [_vm._v("ID:")]),
+              _vm._v(" " + _vm._s(this.id))
+            ]),
+            _vm._v(" "),
+            _c("p", [
+              _c("strong", [_vm._v("Quelle:")]),
+              _vm._v(" " + _vm._s(this.indicator.meta.source))
+            ]),
+            _vm._v(" "),
+            _c("p", [
+              _c("strong", [_vm._v("Lizenz:")]),
+              _vm._v(" " + _vm._s(this.indicator.meta.license))
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "w-1/2 flex-none" }, [
+        _c("div", { staticClass: "text-grey-darker text-center p-1" }, [
+          _vm._m(1),
+          _vm._v(" "),
+          _c("div", { staticClass: "text-normal text-left" }, [
+            _vm._v(
+              "\n\t\t\t\t\t" + _vm._s(this.indicator.description) + "\n\t\t\t\t"
+            )
+          ])
+        ])
+      ])
+    ]),
     _vm._v(" "),
     _c("div", { staticClass: "w-full my-2" }, [
       _c("ul", { staticClass: "list-reset" }, [
@@ -26461,7 +26497,7 @@ var render = function() {
             ),
             _vm._v(" "),
             _c("div", { staticClass: "float-right" }, [
-              _vm._m(1),
+              _vm._m(2),
               _vm._v(" "),
               _c(
                 "button",
@@ -26655,41 +26691,21 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "flex flex-no-wrap" }, [
-      _c("div", { staticClass: "w-1/2 flex-none" }, [
-        _c("div", { staticClass: "text-grey-darker p-1" }, [
-          _c("div", { staticClass: "p-2 bg-grey-lighter mb-4" }, [
-            _c(
-              "h6",
-              {
-                staticClass: "block text-greydarkest text-sm mb-0 text-center"
-              },
-              [_vm._v("Indikator-Beschreibung (Metadaten)")]
-            )
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "text-normal text-left" }, [
-            _c("p", [_c("strong", [_vm._v("ID:")]), _vm._v(" asdasd")]),
-            _vm._v(" "),
-            _c("p", [_c("strong", [_vm._v("Quelle:")]), _vm._v(" test")]),
-            _vm._v(" "),
-            _c("p", [_c("strong", [_vm._v("Lizenz:")]), _vm._v(" test")])
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "w-1/2 flex-none" }, [
-        _c("div", { staticClass: "text-grey-darker text-center p-1" }, [
-          _c("div", { staticClass: "p-2 bg-grey-lighter mb-4" }, [
-            _c("h6", { staticClass: "text-greydarkest text-sm mb-0" }, [
-              _vm._v("Indikator-Erläuterung")
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "text-normal text-left" }, [
-            _vm._v("\n\t\t\t\t\tDESC\n\t\t\t\t")
-          ])
-        ])
+    return _c("div", { staticClass: "p-2 bg-grey-lighter mb-4" }, [
+      _c(
+        "h6",
+        { staticClass: "block text-greydarkest text-sm mb-0 text-center" },
+        [_vm._v("Indikator-Beschreibung (Metadaten)")]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "p-2 bg-grey-lighter mb-4" }, [
+      _c("h6", { staticClass: "text-greydarkest text-sm mb-0" }, [
+        _vm._v("Indikator-Erläuterung")
       ])
     ])
   },
