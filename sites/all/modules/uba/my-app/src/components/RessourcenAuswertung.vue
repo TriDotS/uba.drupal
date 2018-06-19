@@ -136,19 +136,12 @@
                 } else {
                     item.expanded = true;
                 }
-	            // split level to array "ABC-01234" => ['ABC','01234']
                 let curr_item_arr = item.level.split('-');
-                // level = stringleght - 1
 	            let curr_level = curr_item_arr[1].length - 1;
-	            // current category
 	            let curr_category = curr_item_arr[0];
-	            // loop through all rows
                 for(let i = 0; i < this.table.tbody.length; i++) {
-                    // split the current row level to array
                     let row_item_arr = this.table.tbody[i].level.split('-');
-                    // get the curretn row level
                     let row_level = row_item_arr[1].length - 1;
-                    //get the current row category
                     let row_category = row_item_arr[0];
 	                let isHidden = this.table.tbody[i].isHidden;
 	                if( isHidden ) {

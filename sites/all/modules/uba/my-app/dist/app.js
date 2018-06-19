@@ -25802,19 +25802,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             } else {
                 item.expanded = true;
             }
-            // split level to array "ABC-01234" => ['ABC','01234']
             var curr_item_arr = item.level.split('-');
-            // level = stringleght - 1
             var curr_level = curr_item_arr[1].length - 1;
-            // current category
             var curr_category = curr_item_arr[0];
-            // loop through all rows
             for (var i = 0; i < this.table.tbody.length; i++) {
-                // split the current row level to array
                 var row_item_arr = this.table.tbody[i].level.split('-');
-                // get the curretn row level
                 var row_level = row_item_arr[1].length - 1;
-                //get the current row category
                 var row_category = row_item_arr[0];
                 var isHidden = this.table.tbody[i].isHidden;
                 if (isHidden) {
