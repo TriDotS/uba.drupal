@@ -48,7 +48,7 @@
 					<tbody class="my-2 border-0">
 					<tr v-for="(item, index) in this.table.tbody" :class="{'hidden': item.isHidden, ['level-'+capitalize(item.level)]:item.level }" >
 						<td><input type="checkbox" :value="index" v-model="item.checked"></td>
-						<td @click="showChildren(item)" :class="{'rot-90 pl-2': item.expanded}">></td>
+						<td @click="showChildren(item)" class="" :class="{'rot-90 pl-2': item.expanded}">></td>
 						<td>{{item.name}}</td>
 						<td v-for="value in item.data">{{value}}</td>
 					</tr>
