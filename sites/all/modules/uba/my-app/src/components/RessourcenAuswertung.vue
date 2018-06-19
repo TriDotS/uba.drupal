@@ -103,7 +103,6 @@
             capitalize(value) {
                 let curr_item_arr = value.split('-');
                 let curr_level = curr_item_arr[1].length - 1;
-                console.log(value);
                 return curr_level;
             },
             updateTable() {
