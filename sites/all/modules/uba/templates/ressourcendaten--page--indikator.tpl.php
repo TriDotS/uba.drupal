@@ -1,11 +1,5 @@
 <div id="app">
-	<div is="ressourcenAuswertung"
-	     id="<?php print $variables['indicator_id']; ?>"
-	     url="http://uba.webshox.org/api/indicators/"
-	     :series='<?php print json_encode($variables['preprocessed_indicator']->series); ?>'
-	     :categories='<?php print json_encode($variables['preprocessed_indicator']->categories); ?>'
-	     name='<?php print $variables['preprocessed_indicator']->title->name; ?>'
-	     inline-template>
+	<div is="ressourcenAuswertung" id="<?php print $variables['indicator_id']; ?>" url="http://uba.webshox.org/api/indicators/" :series='<?php print json_encode($variables['preprocessed_indicator']->series); ?>' :categories='<?php print json_encode($variables['preprocessed_indicator']->categories); ?>' name='<?php print $variables['preprocessed_indicator']->title->name; ?>' inline-template >
 		<div class="wrapper">
 			<div class="flex flex-no-wrap">
 				<div class="w-1/2 flex-none">
