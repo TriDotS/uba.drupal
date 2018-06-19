@@ -262,6 +262,14 @@
             },
 		    
             onSubmit() {
+                _paq.push(['trackSiteSearch',
+                    // Search keyword searched for
+                    "Banana",
+                    // Search category selected in your search engine. If you do not need this, set to false
+                    "Organic Food",
+                    // Number of results on the Search results page. Zero indicates a 'No Result Search Keyword'. Set to false if you don't know
+                    0
+                ]);
                 this.updateTable();
             },
 
