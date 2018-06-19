@@ -15,6 +15,7 @@ Vue.component('datenexplorer', require('./components/DatenExplorer'));
 Vue.component('datenpool', require('./components/DatenPool'));
 Vue.component('ressourcenIndikatoren', require('./components/RessourcenIndikatoren'));
 Vue.component('ressourcenAuswertung', require('./components/RessourcenAuswertung'));
+Vue.component('ressourcenAuswertung2', require('./components/RessourcenAuswertung2'));
 //
 import Highcharts from 'highcharts';
 import loadExportingImages from 'highcharts/modules/exporting';

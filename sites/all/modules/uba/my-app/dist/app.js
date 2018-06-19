@@ -70,7 +70,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(5);
+var bind = __webpack_require__(7);
 var isBuffer = __webpack_require__(19);
 
 /*global toString:true*/
@@ -506,10 +506,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(6);
+    adapter = __webpack_require__(8);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(6);
+    adapter = __webpack_require__(8);
   }
   return adapter;
 }
@@ -801,274 +801,6 @@ module.exports = g;
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(0);
-var settle = __webpack_require__(22);
-var buildURL = __webpack_require__(24);
-var parseHeaders = __webpack_require__(25);
-var isURLSameOrigin = __webpack_require__(26);
-var createError = __webpack_require__(7);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(27);
-
-module.exports = function xhrAdapter(config) {
-  return new Promise(function dispatchXhrRequest(resolve, reject) {
-    var requestData = config.data;
-    var requestHeaders = config.headers;
-
-    if (utils.isFormData(requestData)) {
-      delete requestHeaders['Content-Type']; // Let the browser set it
-    }
-
-    var request = new XMLHttpRequest();
-    var loadEvent = 'onreadystatechange';
-    var xDomain = false;
-
-    // For IE 8/9 CORS support
-    // Only supports POST and GET calls and doesn't returns the response headers.
-    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ("development" !== 'test' &&
-        typeof window !== 'undefined' &&
-        window.XDomainRequest && !('withCredentials' in request) &&
-        !isURLSameOrigin(config.url)) {
-      request = new window.XDomainRequest();
-      loadEvent = 'onload';
-      xDomain = true;
-      request.onprogress = function handleProgress() {};
-      request.ontimeout = function handleTimeout() {};
-    }
-
-    // HTTP basic authentication
-    if (config.auth) {
-      var username = config.auth.username || '';
-      var password = config.auth.password || '';
-      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-    }
-
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-
-    // Set the request timeout in MS
-    request.timeout = config.timeout;
-
-    // Listen for ready state
-    request[loadEvent] = function handleLoad() {
-      if (!request || (request.readyState !== 4 && !xDomain)) {
-        return;
-      }
-
-      // The request errored out and we didn't get a response, this will be
-      // handled by onerror instead
-      // With one exception: request that using file: protocol, most browsers
-      // will return status as 0 even though it's a successful request
-      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
-        return;
-      }
-
-      // Prepare the response
-      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-      var response = {
-        data: responseData,
-        // IE sends 1223 instead of 204 (https://github.com/axios/axios/issues/201)
-        status: request.status === 1223 ? 204 : request.status,
-        statusText: request.status === 1223 ? 'No Content' : request.statusText,
-        headers: responseHeaders,
-        config: config,
-        request: request
-      };
-
-      settle(resolve, reject, response);
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle low level network errors
-    request.onerror = function handleError() {
-      // Real errors are hidden from us by the browser
-      // onerror should only fire if it's a network error
-      reject(createError('Network Error', config, null, request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Handle timeout
-    request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
-        request));
-
-      // Clean up request
-      request = null;
-    };
-
-    // Add xsrf header
-    // This is only done if running in a standard browser environment.
-    // Specifically not if we're in a web worker, or react-native.
-    if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(28);
-
-      // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
-          cookies.read(config.xsrfCookieName) :
-          undefined;
-
-      if (xsrfValue) {
-        requestHeaders[config.xsrfHeaderName] = xsrfValue;
-      }
-    }
-
-    // Add headers to the request
-    if ('setRequestHeader' in request) {
-      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-          // Remove Content-Type if data is undefined
-          delete requestHeaders[key];
-        } else {
-          // Otherwise add header to the request
-          request.setRequestHeader(key, val);
-        }
-      });
-    }
-
-    // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
-    }
-
-    // Add responseType to request if needed
-    if (config.responseType) {
-      try {
-        request.responseType = config.responseType;
-      } catch (e) {
-        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
-        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
-        if (config.responseType !== 'json') {
-          throw e;
-        }
-      }
-    }
-
-    // Handle progress if needed
-    if (typeof config.onDownloadProgress === 'function') {
-      request.addEventListener('progress', config.onDownloadProgress);
-    }
-
-    // Not all browsers support upload events
-    if (typeof config.onUploadProgress === 'function' && request.upload) {
-      request.upload.addEventListener('progress', config.onUploadProgress);
-    }
-
-    if (config.cancelToken) {
-      // Handle cancellation
-      config.cancelToken.promise.then(function onCanceled(cancel) {
-        if (!request) {
-          return;
-        }
-
-        request.abort();
-        reject(cancel);
-        // Clean up request
-        request = null;
-      });
-    }
-
-    if (requestData === undefined) {
-      requestData = null;
-    }
-
-    // Send the request
-    request.send(requestData);
-  });
-};
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var enhanceError = __webpack_require__(23);
-
-/**
- * Create an Error with the specified message, config, error code, request and response.
- *
- * @param {string} message The error message.
- * @param {Object} config The config.
- * @param {string} [code] The error code (for example, 'ECONNABORTED').
- * @param {Object} [request] The request.
- * @param {Object} [response] The response.
- * @returns {Error} The created error.
- */
-module.exports = function createError(message, config, code, request, response) {
-  var error = new Error(message);
-  return enhanceError(error, config, code, request, response);
-};
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function isCancel(value) {
-  return !!(value && value.__CANCEL__);
-};
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * A `Cancel` is an object that is thrown when an operation is canceled.
- *
- * @class
- * @param {string=} message The message.
- */
-function Cancel(message) {
-  this.message = message;
-}
-
-Cancel.prototype.toString = function toString() {
-  return 'Cancel' + (this.message ? ': ' + this.message : '');
-};
-
-Cancel.prototype.__CANCEL__ = true;
-
-module.exports = Cancel;
-
-
-/***/ }),
-/* 10 */
 /***/ (function(module, exports) {
 
 /*
@@ -1150,7 +882,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 11 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1375,6 +1107,274 @@ function applyToTag (styleElement, obj) {
     styleElement.appendChild(document.createTextNode(css))
   }
 }
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(0);
+var settle = __webpack_require__(22);
+var buildURL = __webpack_require__(24);
+var parseHeaders = __webpack_require__(25);
+var isURLSameOrigin = __webpack_require__(26);
+var createError = __webpack_require__(9);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(27);
+
+module.exports = function xhrAdapter(config) {
+  return new Promise(function dispatchXhrRequest(resolve, reject) {
+    var requestData = config.data;
+    var requestHeaders = config.headers;
+
+    if (utils.isFormData(requestData)) {
+      delete requestHeaders['Content-Type']; // Let the browser set it
+    }
+
+    var request = new XMLHttpRequest();
+    var loadEvent = 'onreadystatechange';
+    var xDomain = false;
+
+    // For IE 8/9 CORS support
+    // Only supports POST and GET calls and doesn't returns the response headers.
+    // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+    if ("development" !== 'test' &&
+        typeof window !== 'undefined' &&
+        window.XDomainRequest && !('withCredentials' in request) &&
+        !isURLSameOrigin(config.url)) {
+      request = new window.XDomainRequest();
+      loadEvent = 'onload';
+      xDomain = true;
+      request.onprogress = function handleProgress() {};
+      request.ontimeout = function handleTimeout() {};
+    }
+
+    // HTTP basic authentication
+    if (config.auth) {
+      var username = config.auth.username || '';
+      var password = config.auth.password || '';
+      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+    }
+
+    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+
+    // Set the request timeout in MS
+    request.timeout = config.timeout;
+
+    // Listen for ready state
+    request[loadEvent] = function handleLoad() {
+      if (!request || (request.readyState !== 4 && !xDomain)) {
+        return;
+      }
+
+      // The request errored out and we didn't get a response, this will be
+      // handled by onerror instead
+      // With one exception: request that using file: protocol, most browsers
+      // will return status as 0 even though it's a successful request
+      if (request.status === 0 && !(request.responseURL && request.responseURL.indexOf('file:') === 0)) {
+        return;
+      }
+
+      // Prepare the response
+      var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+      var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+      var response = {
+        data: responseData,
+        // IE sends 1223 instead of 204 (https://github.com/axios/axios/issues/201)
+        status: request.status === 1223 ? 204 : request.status,
+        statusText: request.status === 1223 ? 'No Content' : request.statusText,
+        headers: responseHeaders,
+        config: config,
+        request: request
+      };
+
+      settle(resolve, reject, response);
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle low level network errors
+    request.onerror = function handleError() {
+      // Real errors are hidden from us by the browser
+      // onerror should only fire if it's a network error
+      reject(createError('Network Error', config, null, request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Handle timeout
+    request.ontimeout = function handleTimeout() {
+      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+        request));
+
+      // Clean up request
+      request = null;
+    };
+
+    // Add xsrf header
+    // This is only done if running in a standard browser environment.
+    // Specifically not if we're in a web worker, or react-native.
+    if (utils.isStandardBrowserEnv()) {
+      var cookies = __webpack_require__(28);
+
+      // Add xsrf header
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+          cookies.read(config.xsrfCookieName) :
+          undefined;
+
+      if (xsrfValue) {
+        requestHeaders[config.xsrfHeaderName] = xsrfValue;
+      }
+    }
+
+    // Add headers to the request
+    if ('setRequestHeader' in request) {
+      utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+        if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+          // Remove Content-Type if data is undefined
+          delete requestHeaders[key];
+        } else {
+          // Otherwise add header to the request
+          request.setRequestHeader(key, val);
+        }
+      });
+    }
+
+    // Add withCredentials to request if needed
+    if (config.withCredentials) {
+      request.withCredentials = true;
+    }
+
+    // Add responseType to request if needed
+    if (config.responseType) {
+      try {
+        request.responseType = config.responseType;
+      } catch (e) {
+        // Expected DOMException thrown by browsers not compatible XMLHttpRequest Level 2.
+        // But, this can be suppressed for 'json' type as it can be parsed by default 'transformResponse' function.
+        if (config.responseType !== 'json') {
+          throw e;
+        }
+      }
+    }
+
+    // Handle progress if needed
+    if (typeof config.onDownloadProgress === 'function') {
+      request.addEventListener('progress', config.onDownloadProgress);
+    }
+
+    // Not all browsers support upload events
+    if (typeof config.onUploadProgress === 'function' && request.upload) {
+      request.upload.addEventListener('progress', config.onUploadProgress);
+    }
+
+    if (config.cancelToken) {
+      // Handle cancellation
+      config.cancelToken.promise.then(function onCanceled(cancel) {
+        if (!request) {
+          return;
+        }
+
+        request.abort();
+        reject(cancel);
+        // Clean up request
+        request = null;
+      });
+    }
+
+    if (requestData === undefined) {
+      requestData = null;
+    }
+
+    // Send the request
+    request.send(requestData);
+  });
+};
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var enhanceError = __webpack_require__(23);
+
+/**
+ * Create an Error with the specified message, config, error code, request and response.
+ *
+ * @param {string} message The error message.
+ * @param {Object} config The config.
+ * @param {string} [code] The error code (for example, 'ECONNABORTED').
+ * @param {Object} [request] The request.
+ * @param {Object} [response] The response.
+ * @returns {Error} The created error.
+ */
+module.exports = function createError(message, config, code, request, response) {
+  var error = new Error(message);
+  return enhanceError(error, config, code, request, response);
+};
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function isCancel(value) {
+  return !!(value && value.__CANCEL__);
+};
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * A `Cancel` is an object that is thrown when an operation is canceled.
+ *
+ * @class
+ * @param {string=} message The message.
+ */
+function Cancel(message) {
+  this.message = message;
+}
+
+Cancel.prototype.toString = function toString() {
+  return 'Cancel' + (this.message ? ': ' + this.message : '');
+};
+
+Cancel.prototype.__CANCEL__ = true;
+
+module.exports = Cancel;
 
 
 /***/ }),
@@ -1818,13 +1818,13 @@ module.exports = __webpack_require__(15);
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_highcharts__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_highcharts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_highcharts__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_highcharts_modules_exporting__ = __webpack_require__(56);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_highcharts_modules_exporting__ = __webpack_require__(61);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_highcharts_modules_exporting___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_highcharts_modules_exporting__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highcharts_modules_export_data__ = __webpack_require__(57);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highcharts_modules_export_data__ = __webpack_require__(62);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_highcharts_modules_export_data___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_highcharts_modules_export_data__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_highcharts_modules_offline_exporting__ = __webpack_require__(58);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_highcharts_modules_offline_exporting__ = __webpack_require__(63);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_highcharts_modules_offline_exporting___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_highcharts_modules_offline_exporting__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_highcharts__ = __webpack_require__(59);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_vue_highcharts__ = __webpack_require__(64);
 /**
  * First, we will load all of this project's Javascript utilities and other
  * dependencies. Then, we will be ready to develop a robust and powerful
@@ -1842,6 +1842,7 @@ Vue.component('datenexplorer', __webpack_require__(39));
 Vue.component('datenpool', __webpack_require__(44));
 Vue.component('ressourcenIndikatoren', __webpack_require__(50));
 Vue.component('ressourcenAuswertung', __webpack_require__(52));
+Vue.component('ressourcenAuswertung2', __webpack_require__(56));
 //
 
 
@@ -12243,7 +12244,7 @@ module.exports = __webpack_require__(18);
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(5);
+var bind = __webpack_require__(7);
 var Axios = __webpack_require__(20);
 var defaults = __webpack_require__(2);
 
@@ -12278,9 +12279,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(9);
+axios.Cancel = __webpack_require__(11);
 axios.CancelToken = __webpack_require__(34);
-axios.isCancel = __webpack_require__(8);
+axios.isCancel = __webpack_require__(10);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -12433,7 +12434,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(7);
+var createError = __webpack_require__(9);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -12868,7 +12869,7 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(0);
 var transformData = __webpack_require__(31);
-var isCancel = __webpack_require__(8);
+var isCancel = __webpack_require__(10);
 var defaults = __webpack_require__(2);
 var isAbsoluteURL = __webpack_require__(32);
 var combineURLs = __webpack_require__(33);
@@ -13028,7 +13029,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 "use strict";
 
 
-var Cancel = __webpack_require__(9);
+var Cancel = __webpack_require__(11);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -24410,7 +24411,7 @@ var content = __webpack_require__(41);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(11)("64eb8f48", content, false, {});
+var update = __webpack_require__(6)("64eb8f48", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -24429,7 +24430,7 @@ if(false) {
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(10)(false);
+exports = module.exports = __webpack_require__(5)(false);
 // imports
 
 
@@ -25617,7 +25618,7 @@ var content = __webpack_require__(54);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(11)("4dcae3f5", content, false, {});
+var update = __webpack_require__(6)("4dcae3f5", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -25636,7 +25637,7 @@ if(false) {
 /* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(10)(false);
+exports = module.exports = __webpack_require__(5)(false);
 // imports
 
 
@@ -25809,7 +25810,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
                 var row_item_arr = this.table.tbody[i].level.split('-');
                 var row_level = row_item_arr[1].length - 1;
                 var row_category = row_item_arr[0];
-                var isHidden = this.table.tbody[i].isHidden;
+                var isHidden = JSON.parse(JSON.stringify(this.table.tbody[i].isHidden));
                 if (isHidden) {
                     if (row_category === curr_category && row_level === curr_level + 1 && this.table.tbody[i].level.indexOf(item.level) === 0) {
                         this.table.tbody[i].isHidden = !isHidden;
@@ -25852,6 +25853,367 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /***/ }),
 /* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(67)
+}
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(59)
+/* template */
+var __vue_template__ = __webpack_require__(69)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "src/components/RessourcenAuswertung2.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-12ec9940", Component.options)
+  } else {
+    hotAPI.reload("data-v-12ec9940", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 57 */,
+/* 58 */,
+/* 59 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+    props: ['id', 'url', 'categories', 'series', 'name'],
+    data: function data() {
+        return {
+            isVisibleDiagram: false,
+
+            filter: {
+                year: {
+                    from: '',
+                    to: ''
+                }
+
+            },
+            table: {
+                thead: null,
+                tbody: null
+            },
+            rows: []
+        };
+    },
+    mounted: function mounted() {
+        this.updateTable();
+    },
+
+    computed: {
+        startYearPlaceholder: function startYearPlaceholder() {
+            return this.categories[0];
+        },
+        endYearPlaceholder: function endYearPlaceholder() {
+            return this.categories[this.categories.length - 1];
+        },
+        startYear: function startYear() {
+            return this.filter.year.from === '' ? this.categories[0] : this.filter.year.from;
+        },
+        endYear: function endYear() {
+            return this.filter.year.to === '' ? this.categories[this.categories.length - 1] : this.filter.year.to;
+        },
+        boolArray: function boolArray() {
+            var startPos = this.categories.indexOf(this.startYear);
+            var endPos = this.categories.indexOf(this.endYear);
+
+            if (startPos < 0) {
+                startPos = this.categories.indexOf(this.startYearPlaceholder);
+            }
+            if (endPos < 0) {
+                endPos = this.categories.indexOf(this.endYearPlaceholder);
+            }
+            if (startPos > endPos) {
+                var tmpPos = startPos;
+                startPos = endPos;
+                endPos = tmpPos;
+
+                var tmpVal = this.filter.year.from;
+                this.filter.year.from = this.filter.year.to;
+                this.filter.year.to = tmpVal;
+            }
+
+            var boolArray = [];
+            for (var i = 0; i < this.categories.length; i++) {
+                boolArray[i] = true;
+                if (i < startPos) {
+                    boolArray[i] = false;
+                }
+                if (i > endPos) {
+                    boolArray[i] = false;
+                }
+            }
+            return boolArray;
+        },
+        barOptions: function barOptions() {
+            var vm = this;
+            var result = {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: null
+                },
+                navigation: {
+                    buttonOptions: {
+                        enabled: false
+                    }
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {
+                    title: {
+                        text: null
+                    }
+                },
+                series: []
+            };
+            result.title.text = vm.name;
+            result.xAxis.categories = vm.table.thead;
+            result.series = [];
+
+            if (vm.table.tbody !== null) {
+                for (var i = 0; i < vm.table.tbody.length; i++) {
+                    if (vm.table.tbody[i].checked) {
+                        result.series.push(JSON.parse(JSON.stringify(vm.table.tbody[i])));
+                    }
+                }
+            }
+
+            return result;
+        }
+    },
+    methods: {
+        capitalize: function capitalize(value) {
+            var curr_item_arr = value.split('-');
+            var curr_level = curr_item_arr[1].length - 1;
+            return curr_level;
+        },
+        updateTable: function updateTable() {
+            if (this.table.tbody === null) {
+                this.table.tbody = JSON.parse(JSON.stringify(this.series));
+            }
+
+            var boolArray = this.boolArray;
+
+            var thead = [];
+            for (var c = 0; c < this.categories.length; c++) {
+                if (boolArray[c]) {
+                    thead.push(this.categories[c]);
+                }
+            }
+            this.table.thead = thead;
+
+            var tbody = [];
+            for (var i = 0; i < this.table.tbody.length; i++) {
+                var obj = JSON.parse(JSON.stringify(this.table.tbody[i]));
+                var tmp_data = [];
+                for (var d = 0; d < obj.data.length; d++) {
+                    if (boolArray[d]) {
+                        tmp_data.push(obj.data[d]);
+                    }
+                }
+                obj.data = tmp_data;
+                tbody.push(obj);
+            }
+            this.table.tbody = tbody;
+        },
+        showChildren: function showChildren(item) {
+            if (item.expanded) {
+                item.expanded = false;
+            } else {
+                item.expanded = true;
+            }
+            var curr_item_arr = item.level.split('-');
+            var curr_level = curr_item_arr[1].length - 1;
+            var curr_category = curr_item_arr[0];
+            for (var i = 0; i < this.table.tbody.length; i++) {
+                var row_item_arr = this.table.tbody[i].level.split('-');
+                var row_level = row_item_arr[1].length - 1;
+                var row_category = row_item_arr[0];
+                var isHidden = JSON.parse(JSON.stringify(this.table.tbody[i].isHidden));
+                if (isHidden) {
+                    if (row_category === curr_category && row_level === curr_level + 1 && this.table.tbody[i].level.indexOf(item.level) === 0) {
+                        this.table.tbody[i].isHidden = !isHidden;
+                    }
+                } else {
+                    if (row_category === curr_category && row_level >= curr_level + 1) {
+                        this.table.tbody[i].isHidden = !isHidden;
+                        this.table.tbody[i].expanded = false;
+                    }
+                }
+            }
+        },
+        onSubmit: function onSubmit() {
+            this.updateTable();
+        },
+        onReset: function onReset() {
+            this.filter.year.from = '';
+            this.filter.year.to = '';
+            this.table.tbody = null;
+            this.updateTable();
+        },
+        showDiagram: function showDiagram(bool) {
+            this.isVisibleDiagram = bool;
+        },
+        myExport: function myExport(type) {
+            this.$refs.highcharts.chart.exportChartLocal({ type: type });
+        },
+        myPrint: function myPrint() {
+            this.$refs.highcharts.chart.print();
+        },
+        getCSV: function getCSV() {
+            this.$refs.highcharts.chart.downloadCSV();
+        },
+        getXLS: function getXLS() {
+            this.$refs.highcharts.chart.downloadXLS();
+        }
+    }
+
+});
+
+/***/ }),
+/* 60 */,
+/* 61 */
 /***/ (function(module, exports) {
 
 /*
@@ -25883,7 +26245,7 @@ function(){var a=this,b=a.options.exporting,e=b.buttons,c=a.isDirtyExporting||!a
 
 
 /***/ }),
-/* 57 */
+/* 62 */
 /***/ (function(module, exports) {
 
 /*
@@ -25914,7 +26276,7 @@ n.mapbubble&&(n.mapbubble.prototype.exportKey="name");n.treemap&&(n.treemap.prot
 
 
 /***/ }),
-/* 58 */
+/* 63 */
 /***/ (function(module, exports) {
 
 /*
@@ -25939,14 +26301,14 @@ b,f)})};C(!0,c.getOptions().exporting,{libURL:"https://code.highcharts.com/6.1.0
 
 
 /***/ }),
-/* 59 */
+/* 64 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_highcharts__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_highcharts___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_highcharts__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constructors_js__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__create_js__ = __webpack_require__(60);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__create_js__ = __webpack_require__(65);
 
 
 
@@ -25964,11 +26326,11 @@ function install(Vue, options) {
 
 
 /***/ }),
-/* 60 */
+/* 65 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__clone_js__ = __webpack_require__(61);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__clone_js__ = __webpack_require__(66);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constructors_js__ = __webpack_require__(13);
 
 
@@ -26046,7 +26408,7 @@ function create(tagName, Highcharts, Vue) {
 
 
 /***/ }),
-/* 61 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -26073,6 +26435,506 @@ function clone(obj) {
   }
 }
 
+
+/***/ }),
+/* 67 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(68);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(6)("7628e4b6", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-12ec9940\",\"scoped\":false,\"hasInlineConfig\":true}!../../node_modules/sass-loader/lib/loader.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./RessourcenAuswertung2.vue", function() {
+     var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-12ec9940\",\"scoped\":false,\"hasInlineConfig\":true}!../../node_modules/sass-loader/lib/loader.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./RessourcenAuswertung2.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 68 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(5)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.level-1 {\n  background-color: white;\n}\n.level-2 {\n  background-color: #f2f2f2;\n}\n.level-3 {\n  background-color: #e6e6e6;\n}\n.level-4 {\n  background-color: #d9d9d9;\n}\n.level-5 {\n  background-color: #cccccc;\n}\n.level-6 {\n  background-color: #bfbfbf;\n}\n.level-7 {\n  background-color: #b3b3b3;\n}\n.rot-90 {\n  transform: rotate(90deg);\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 69 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "wrapper" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("div", { staticClass: "w-full my-2" }, [
+      _c("ul", { staticClass: "list-reset" }, [
+        _c(
+          "li",
+          {
+            staticClass:
+              "mb-0 p-2 bg-grey-light text-grey-darkest inline-block",
+            class: { "font-bold": !_vm.isVisibleDiagram },
+            on: {
+              click: function($event) {
+                _vm.showDiagram(false)
+              }
+            }
+          },
+          [_vm._v("Tabelle")]
+        ),
+        _vm._v(" "),
+        _c(
+          "li",
+          {
+            staticClass:
+              "mb-0 p-2 bg-grey-light text-grey-darkest inline-block",
+            class: { "font-bold": _vm.isVisibleDiagram },
+            on: {
+              click: function($event) {
+                _vm.showDiagram(true)
+              }
+            }
+          },
+          [_vm._v("Diagramm")]
+        )
+      ])
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "w-full max-w-full my-2" }, [
+      _c(
+        "div",
+        {
+          staticClass: "vue-table max-w-full",
+          class: { hidden: _vm.isVisibleDiagram }
+        },
+        [
+          _c(
+            "table",
+            { staticClass: "block overflow-x-auto whitespace-no-wrap" },
+            [
+              _c("thead", { staticClass: "text-grey-darkest" }, [
+                _c(
+                  "tr",
+                  { staticClass: "bg-grey-light" },
+                  [
+                    _c("th", { staticClass: "p-2" }),
+                    _vm._v(" "),
+                    _c("th", { staticClass: "p-2" }),
+                    _vm._v(" "),
+                    _c("th", { staticClass: "p-2" }, [
+                      _vm._v("Indikator-Gliederung")
+                    ]),
+                    _vm._v(" "),
+                    _vm._l(this.table.thead, function(item) {
+                      return _c("th", [_vm._v(_vm._s(item))])
+                    })
+                  ],
+                  2
+                )
+              ]),
+              _vm._v(" "),
+              _c(
+                "tbody",
+                { staticClass: "my-2 border-0" },
+                _vm._l(this.table.tbody, function(item, index) {
+                  return _c(
+                    "tr",
+                    {
+                      class: ((_obj = { hidden: item.isHidden }),
+                      (_obj["level-" + _vm.capitalize(item.level)] =
+                        item.level),
+                      _obj)
+                    },
+                    [
+                      _c("td", [
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: item.checked,
+                              expression: "item.checked"
+                            }
+                          ],
+                          attrs: { type: "checkbox" },
+                          domProps: {
+                            value: index,
+                            checked: Array.isArray(item.checked)
+                              ? _vm._i(item.checked, index) > -1
+                              : item.checked
+                          },
+                          on: {
+                            change: function($event) {
+                              var $$a = item.checked,
+                                $$el = $event.target,
+                                $$c = $$el.checked ? true : false
+                              if (Array.isArray($$a)) {
+                                var $$v = index,
+                                  $$i = _vm._i($$a, $$v)
+                                if ($$el.checked) {
+                                  $$i < 0 &&
+                                    _vm.$set(item, "checked", $$a.concat([$$v]))
+                                } else {
+                                  $$i > -1 &&
+                                    _vm.$set(
+                                      item,
+                                      "checked",
+                                      $$a
+                                        .slice(0, $$i)
+                                        .concat($$a.slice($$i + 1))
+                                    )
+                                }
+                              } else {
+                                _vm.$set(item, "checked", $$c)
+                              }
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "td",
+                        {
+                          class: { "rot-90 pl-2": item.expanded },
+                          on: {
+                            click: function($event) {
+                              _vm.showChildren(item)
+                            }
+                          }
+                        },
+                        [_vm._v(">")]
+                      ),
+                      _vm._v(" "),
+                      _c("td", [_vm._v(_vm._s(item.name))]),
+                      _vm._v(" "),
+                      _vm._l(item.data, function(value) {
+                        return _c("td", [_vm._v(_vm._s(value))])
+                      })
+                    ],
+                    2
+                  )
+                  var _obj
+                })
+              )
+            ]
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "vue-diagramm",
+          class: { hidden: !_vm.isVisibleDiagram }
+        },
+        [
+          _c("highcharts", {
+            ref: "highcharts",
+            attrs: { options: _vm.barOptions }
+          }),
+          _vm._v(" "),
+          _c("div", { staticClass: "py-2" }, [
+            _c(
+              "button",
+              {
+                staticClass: "bg-grey-darker text-white p-2",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.onReset($event)
+                  }
+                }
+              },
+              [_vm._v("Zurücksetzen auf vollständige Darstellung")]
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "py-2" }, [
+            _c(
+              "button",
+              {
+                staticClass: "bg-grey-darker text-white p-2",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.myPrint($event)
+                  }
+                }
+              },
+              [_vm._v("Abblidung drucken")]
+            ),
+            _vm._v(" "),
+            _c("div", { staticClass: "float-right" }, [
+              _vm._m(1),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "bg-grey-darker text-white p-2",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      _vm.myExport("image/png")
+                    }
+                  }
+                },
+                [_vm._v("PNG")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "bg-grey-darker text-white p-2",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      _vm.myExport("image/jpeg")
+                    }
+                  }
+                },
+                [_vm._v("JPEG")]
+              ),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "bg-grey-darker text-white p-2",
+                  attrs: { type: "button" },
+                  on: {
+                    click: function($event) {
+                      _vm.myExport("image/svg+xml")
+                    }
+                  }
+                },
+                [_vm._v("SVG")]
+              )
+            ])
+          ])
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c("div", { staticClass: "px-2 py-4 bg-grey-light mb-4 text-sm" }, [
+        _c("h6", { staticClass: "text-grey-darkest mb-4 font-bold text-sm" }, [
+          _vm._v("Darstellung Einschränken:")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-inline w-full" }, [
+          _c("div", { staticClass: "form-group inline-block mr-2" }, [
+            _c(
+              "label",
+              { staticClass: "inline-block", attrs: { for: "startYear1" } },
+              [_vm._v("Ab Jahr:")]
+            ),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.filter.year.from,
+                  expression: "filter.year.from"
+                }
+              ],
+              staticClass: "inline-block form-control",
+              attrs: {
+                type: "text",
+                id: "startYear1",
+                placeholder: _vm.startYearPlaceholder
+              },
+              domProps: { value: _vm.filter.year.from },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.filter.year, "from", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group inline-block mr-2" }, [
+            _c(
+              "label",
+              { staticClass: "inline-block", attrs: { for: "endYear1" } },
+              [_vm._v("Bis Jahr:")]
+            ),
+            _vm._v(" "),
+            _c("input", {
+              directives: [
+                {
+                  name: "model",
+                  rawName: "v-model",
+                  value: _vm.filter.year.to,
+                  expression: "filter.year.to"
+                }
+              ],
+              staticClass: "inline-block form-control",
+              attrs: {
+                type: "text",
+                id: "endYear1",
+                placeholder: _vm.endYearPlaceholder
+              },
+              domProps: { value: _vm.filter.year.to },
+              on: {
+                input: function($event) {
+                  if ($event.target.composing) {
+                    return
+                  }
+                  _vm.$set(_vm.filter.year, "to", $event.target.value)
+                }
+              }
+            })
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "form-group inline-block" }, [
+            _c(
+              "button",
+              {
+                staticClass: "bg-grey-darker text-white p-2",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.onSubmit($event)
+                  }
+                }
+              },
+              [_vm._v("Anwenden")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "bg-grey-darker text-white p-2",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    return _vm.onReset($event)
+                  }
+                }
+              },
+              [_vm._v("Zurücksetzen")]
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c(
+          "h6",
+          { staticClass: "text-grey-darkest mb-4 font-bold text-sm mt-6" },
+          [_vm._v("Ausgewählte Werte Download:")]
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "form-inline w-full" }, [
+          _c("div", { staticClass: "form-group inline-block" }, [
+            _c(
+              "button",
+              {
+                staticClass: "bg-grey-darker text-white p-2",
+                attrs: { type: "button" },
+                on: { click: _vm.getCSV }
+              },
+              [_vm._v("CSV")]
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "bg-grey-darker text-white p-2",
+                attrs: { type: "button" },
+                on: { click: _vm.getXLS }
+              },
+              [_vm._v("XLS")]
+            )
+          ])
+        ])
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "flex flex-no-wrap" }, [
+      _c("div", { staticClass: "w-1/2 flex-none" }, [
+        _c("div", { staticClass: "text-grey-darker p-1" }, [
+          _c("div", { staticClass: "p-2 bg-grey-lighter mb-4" }, [
+            _c(
+              "h6",
+              {
+                staticClass: "block text-greydarkest text-sm mb-0 text-center"
+              },
+              [_vm._v("Indikator-Beschreibung (Metadaten)")]
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "text-normal text-left" }, [
+            _c("p", [_c("strong", [_vm._v("ID:")]), _vm._v(" asdasd")]),
+            _vm._v(" "),
+            _c("p", [_c("strong", [_vm._v("Quelle:")]), _vm._v(" test")]),
+            _vm._v(" "),
+            _c("p", [_c("strong", [_vm._v("Lizenz:")]), _vm._v(" test")])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "w-1/2 flex-none" }, [
+        _c("div", { staticClass: "text-grey-darker text-center p-1" }, [
+          _c("div", { staticClass: "p-2 bg-grey-lighter mb-4" }, [
+            _c("h6", { staticClass: "text-greydarkest text-sm mb-0" }, [
+              _vm._v("Indikator-Erläuterung")
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "text-normal text-left" }, [
+            _vm._v("\n\t\t\t\t\tDESC\n\t\t\t\t")
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", [_c("strong", [_vm._v("Download der Abbildung: ")])])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-12ec9940", module.exports)
+  }
+}
 
 /***/ })
 /******/ ]);

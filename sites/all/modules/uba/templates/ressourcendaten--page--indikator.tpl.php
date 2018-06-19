@@ -85,11 +85,11 @@
 					<div class="form-inline w-full">
 						<div class="form-group inline-block mr-2">
 							<label class="inline-block" for="startYear1">Ab Jahr:</label>
-							<input class="inline-block" type="text" class="form-control" id="startYear1" :placeholder="startYearPlaceholder" v-model="filter.year.from">
+							<input class="inline-block form-control" type="text" id="startYear1" :placeholder="startYearPlaceholder" v-model="filter.year.from">
 						</div>
 						<div class="form-group inline-block mr-2">
 							<label class="inline-block" for="endYear1">Bis Jahr:</label>
-							<input class="inline-block"  type="text" class="form-control" id="endYear1" :placeholder="endYearPlaceholder" v-model="filter.year.to">
+							<input class="inline-block form-control"  type="text" id="endYear1" :placeholder="endYearPlaceholder" v-model="filter.year.to">
 						</div>
 						<div class="form-group inline-block">
 							<button type="button" class="bg-grey-darker text-white p-2" @click.prevent="onSubmit">Anwenden</button>
