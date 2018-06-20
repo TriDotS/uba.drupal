@@ -1,7 +1,3 @@
-Dokumentation Frotnend
-
-[TOC]
-
 # Installation
 ## Von der Drupal Website
 ![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.26.26.png)
