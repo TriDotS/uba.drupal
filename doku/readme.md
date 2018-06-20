@@ -54,7 +54,8 @@ Zur installation des UBA Themes `uba` muss nur der Themeordner in das Themeverze
 Die Info View ist eine Seite, welche alle Artikel welche mit dem Tag: `info` versehen sind anzeigt.
 
 ### Konfiguration
-![]()
-![]()
-![]()
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2014.12.55.png)
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2014.13.14.png)
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2014.13.39.png)
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2014.14.02.png)
 
