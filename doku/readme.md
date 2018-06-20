@@ -1,86 +1,20 @@
 Dokumentation Frotnend
 
-[TOC]
-
 # Installation
 ## Von der Drupal Website
-![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.26.26.png)
 
+![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.26.26.png)
 > [Download Drupal](https://www.drupal.org/project/drupal) www.drupal.org/project/drupal
 
 ![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.30.38.png)
-
 >[Installation Drupal](https://www.drupal.org/docs/7/install) www.drupal.org/docs/7/install
 
 ## Aus dem GitHub Repository
-
 ![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.38.46.png)
-
 >[GitHub](https://github.com/TriDotS/uba.drupal) www.github.com/TriDotS/uba.drupal
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## UBA Module
+## UBA Modul
 
 ### Zusammenfassung
 Das UBA Modul stellt den Datenexplorer, Datenpool sowie die Indikatoren bereit.
@@ -101,6 +35,9 @@ Dann noch ganz nach unten scrollen und "speichern"
 
 
 ## UBA Theme
+
+### Zusammenfassung
+Das UBA Theme stellt das HTML Grundlayout bereit um es im Corporate Design zu halten.
 
 ### Installation
 Zur installation des UBA Themes `uba` muss nur der Themeordner in das Themeverzeichnis kopiert werden,
