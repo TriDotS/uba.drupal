@@ -1,3 +1,7 @@
+Dokumentation Frotnend
+
+[TOC]
+
 # Installation
 ## Von der Drupal Website
 ![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.26.26.png)
@@ -14,9 +18,95 @@
 
 >[GitHub](https://github.com/TriDotS/uba.drupal) www.github.com/TriDotS/uba.drupal
 
-```seq
-Andrew->China: Says Hello 
-Note right of China: China thinks\nabout it 
-China-->Andrew: How are you? 
-Andrew->>China: I am good thanks!
-```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## UBA Module
+
+### Zusammenfassung
+Das UBA Modul stellt den Datenexplorer, Datenpool sowie die Indikatoren bereit.
+Dafür registriert das Modul ein neues Menü in dem die Links zu den Seiten hinterlegt sind.
+![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2013.45.47.png)
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.45.56.png)
+Der "Info" Menü-Link wird später Manuell hinzugefügt. Dazu später mehr.
+
+
+### Installation
+Zur installation des UBA Drupal Moduls `uba` muss nur der Modulordner in das Modulverzeichnis kopiert werden.
+![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2013.35.26.png)
+
+### Konfiguration
+![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2013.37.58.png)
+Dann noch ganz nach unten scrollen und "speichern"
+![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2013.41.27.png)
+
+
+## UBA Theme
+
+### Installation
+Zur installation des UBA Themes `uba` muss nur der Themeordner in das Themeverzeichnis kopiert werden,
+![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2013.59.00.png)
+
+### Konfiguration
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.52.26.png)
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.52.42.png)
+![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.53.07.png)
