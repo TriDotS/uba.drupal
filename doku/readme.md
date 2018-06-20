@@ -13,3 +13,14 @@
 ![](https://raw.githubusercontent.com/TriDotS/uba.drupal/master/doku/Bildschirmfoto%202018-06-20%20um%2011.38.46.png)
 
 >[GitHub](https://github.com/TriDotS/uba.drupal) www.github.com/TriDotS/uba.drupal
+
+```flow
+st=>start: 用户登陆
+op=>operation: 登陆操作
+cond=>condition: 登陆成功 Yes or No?
+e=>end: 进入后台
+
+st->op->cond
+cond(yes)->e
+cond(no)->op
+```
