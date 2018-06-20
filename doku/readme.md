@@ -1,4 +1,4 @@
-Dokumentation Frotnend
+# Dokumentation Frontend
 
 # Installation
 ## Von der Drupal Website
@@ -47,3 +47,14 @@ Zur installation des UBA Themes `uba` muss nur der Themeordner in das Themeverze
 ![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.52.26.png)
 ![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.52.42.png)
 ![](https://github.com/TriDotS/uba.drupal/raw/master/doku/Bildschirmfoto%202018-06-20%20um%2013.53.07.png)
+
+## Info View
+
+## Zusammenfassung
+Die Info View ist eine Seite, welche alle Artikel welche mit dem Tag: `info` versehen sind anzeigt.
+
+### Konfiguration
+![]()
+![]()
+![]()
+
